@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}
+    
+    {% endblock %}
+
+
+
+    
+    {% block design %}
+
+    {% endblock %}
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #f9f9fb;
+            margin: 0;
+            padding: 0px;
+            color: #333;
+        }
+        
+        .navbar { 
+            background:#343a40; 
+            padding:15px; 
+            color:white; 
+            display:flex; 
+            justify-content:space-between; 
+        }
+        .navbar a { 
+            color:white; 
+            text-decoration:none; 
+            margin-left:15px; 
+        }
+        
+        form{
+            display:inline-block;
+            margin-left:15px;
+        }
+        .logoutbtn{
+            display:inline-block; 
+            padding:10px 15px; 
+            border-radius:5px; 
+            background:#007bff; 
+            color:white; 
+            text-decoration:none;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div class="navbar">
+        <span style="font-size:24px;font-weight:700">Invoice Generator</span>
+        <span>
+            <a href="{% url 'create_invoice' %}">+ New Invoice</a>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logoutbtn">Logout</button>
+            </form>
+        </span>
+    </div>
+
+    {% block content %}
+
+    {% endblock %}
+
+
+    {% block script %}
+
+    {% endblock %}
+
+    
+
+</body>
+</html>

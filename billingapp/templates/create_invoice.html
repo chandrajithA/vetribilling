@@ -1,0 +1,266 @@
+    
+    {% extends 'base.html' %}
+    
+    {% block title %}
+    <title>Create Invoice</title>
+    {% endblock %}
+
+    {% block design %}
+    <style>
+    
+
+    /* Heading */
+    h2 {
+        text-align: center;
+        color: #2c3e50;
+        font-size: 26px;
+        margin-bottom: 20px;
+    }
+    .container{
+        display: flex;
+        justify-content: center;  /* center horizontally */
+        align-items: center;      /* center vertically */
+        min-height: 100vh; 
+    }
+    /* Form Styling */
+    .createinvoiceform {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* Fieldset Styling */
+    fieldset {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: #fafafa;
+    }
+
+    legend {
+        font-weight: bold;
+        color: #2c3e50;
+        padding: 0 10px;
+        font-size: 18px;
+    }
+
+    /* Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 15px;
+    }
+
+    th, td {
+        border: 1px solid #e0e0e0;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #34495e;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    td input {
+        width: 95%;
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    td input:focus {
+        border-color: #2980b9;
+        outline: none;
+        box-shadow: 0 0 6px rgba(41,128,185,0.4);
+    }
+
+    /* Buttons */
+    button {
+        background: #2980b9;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        
+    }
+
+    .addproductbtn{
+        margin-top:20px;
+    }
+
+    button:hover {
+        background: #1f6391;
+    }
+
+   
+
+    /* Grand Total */
+    h3 {
+        text-align: right;
+        margin: 20px 0;
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    #grandTotal {
+        color: #27ae60;
+        font-size: 22px;
+    }
+
+/* Responsive */
+@media (max-width: 768px) {
+    form {
+        padding: 15px;
+    }
+    table {
+        font-size: 13px;
+    }
+    th, td {
+        padding: 6px;
+    }
+    button {
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+    h3 {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+    thead {
+        display: none;
+    }
+    tr {
+        margin-bottom: 12px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        padding: 10px;
+    }
+    td {
+        border: none;
+        text-align: right;
+        position: relative;
+        padding: 8px 6px;
+    }
+    td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+        text-align: left;
+    }
+}
+    </style>
+    {% endblock %}
+
+
+    {% block content %}
+    <h2>Create Invoice</h2>
+<div class="container">
+    <form method="post" class="createinvoiceform">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Customer Details</legend>
+            {{ form.as_p }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Product Details</legend>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th>Tax %</th>
+                        <th>Subtotal</th>
+                        <th>Total with Tax</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="productRows">
+                    <tr>
+                        <td><input type="text" name="product_name[]" required></td>
+                        <td><input type="number" name="unit_price[]" step="0.01" required oninput="calculateRow(this)"></td>
+                        <td><input type="number" name="quantity[]" value="1" min="1" required oninput="calculateRow(this)"></td>
+                        <td><input type="number" name="tax_percentage[]" value="0" step="0.01" oninput="calculateRow(this)"></td>
+                        <td class="subtotal">0</td>
+                        <td class="total">0</td>
+                        <td><button type="button" onclick="removeRow(this)">Delete</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" onclick="addRow()" class="addproductbtn">Add Product</button>
+        </fieldset>
+
+        <h3>Grand Total: <span id="grandTotal">0</span></h3>
+        <button type="submit">Generate Invoice</button>
+    </form>
+    </div>
+    {% endblock %}
+
+    {% block script %}
+    <script>
+        function calculateRow(input) {
+            let row = input.closest("tr");
+            let unitPrice = parseFloat(row.querySelector("input[name='unit_price[]']").value) || 0;
+            let qty = parseInt(row.querySelector("input[name='quantity[]']").value) || 0;
+            let tax = parseFloat(row.querySelector("input[name='tax_percentage[]']").value) || 0;
+
+            let subtotal = unitPrice * qty;
+            let total = subtotal + (subtotal * tax / 100);
+
+            row.querySelector(".subtotal").innerText = subtotal.toFixed(2);
+            row.querySelector(".total").innerText = total.toFixed(2);
+
+            calculateGrandTotal();
+        }
+
+        function calculateGrandTotal() {
+            let totals = document.querySelectorAll(".total");
+            let sum = 0;
+            totals.forEach(t => sum += parseFloat(t.innerText) || 0);
+            document.getElementById("grandTotal").innerText = sum.toFixed(2);
+        }
+
+        function addRow() {
+            let tableBody = document.getElementById("productRows");
+            let newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td><input type="text" name="product_name[]" required></td>
+                <td><input type="number" name="unit_price[]" step="0.01" required oninput="calculateRow(this)"></td>
+                <td><input type="number" name="quantity[]" value="1" min="1" required oninput="calculateRow(this)"></td>
+                <td><input type="number" name="tax_percentage[]" value="0" step="0.01" oninput="calculateRow(this)"></td>
+                <td class="subtotal">0</td>
+                <td class="total">0</td>
+                <td><button type="button" onclick="removeRow(this)">Delete</button></td>
+            `;
+            tableBody.appendChild(newRow);
+        }
+
+        function removeRow(button) {
+            button.closest("tr").remove();
+            calculateGrandTotal();
+        }
+    </script>
+    {% endblock %}
+

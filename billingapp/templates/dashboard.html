@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Dashboard</title>
+{% endblock %}
+
+{% block design %}
+<style>
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.container h2 {
+    margin-bottom: 20px;
+    font-size: 26px;
+    color: #333;
+    text-align: center;
+}
+
+.summary {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 25px;
+}
+
+.summary .box {
+    background: #f8f9fa;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+/* Table Styling */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+thead {
+    background: #007bff;
+    color: #fff;
+}
+
+thead th {
+    padding: 12px;
+    text-align: left;
+    font-size: 15px;
+}
+
+tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+tbody td {
+    padding: 12px;
+    font-size: 14px;
+    color: #444;
+}
+
+tbody tr:hover {
+    background: #f1f1f1;
+}
+
+.btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn.view {
+    background: #007bff;
+    color: #fff;
+}
+
+
+.btn.edit {
+    background: #ffc107;
+    color: #222;
+}
+
+
+.btn.delete {
+    background: #dc3545;
+    color: #fff;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h2>Dashboard</h2>
+
+    <!-- Summary Boxes -->
+    <div class="summary">
+        <div class="box">Total Invoices: {{ invoices.count }}</div>
+        <div class="box">Total Amount: ₹ {{ grand_total|floatformat:2 }}</div>
+    </div>
+
+    <!-- Invoice Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Mobile</th>
+                    <th>Email</th>
+                    <th>Subtotal</th>
+                    <th>Tax Amount</th>
+                    <th>Total (With Tax)</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.customer_name }}</td>
+                    <td>{{ invoice.customer_mobile }}</td>
+                    <td>{{ invoice.customer_email }}</td>
+                    <td>{{ invoice.sub_total|floatformat:2 }}</td>
+                    <td>{{ invoice.tax_amount|floatformat:2 }}</td>
+                    <td>{{ invoice.total_with_tax|floatformat:2 }}</td>
+                    <td>{{ invoice.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <a href="{% url 'invoice_detail' invoice.id %}" class="btn view">View</a>
+                        <a href="{% url 'edit_invoice' invoice.id %}" class="btn edit">Edit</a>
+                        <a href="{% url 'delete_invoice' invoice.id %}" class="btn delete">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;">No invoices yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

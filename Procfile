@@ -1,0 +1,1 @@
+web: gunicorn vetri_billing.wsgi
