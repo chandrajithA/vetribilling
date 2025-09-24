@@ -79,21 +79,31 @@ TEMPLATES = [
 WSGI_APPLICATION = 'vetri_billing.wsgi.application'
 
 
-import pymysql
-pymysql.install_as_MySQLdb()
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         "NAME": env("MYSQL_DATABASE"),
+#         "USER": env("MYSQL_USER"),
+#         "PASSWORD": env("MYSQL_PASSWORD"),
+#         "HOST": env("MYSQL_HOST", default="127.0.0.1"),
+#         "PORT": env("MYSQL_PORT", default="3306"),
+#     }
+# }
+
+import dj_database_url
+import pymysql
+pymysql.install_as_MySQLdb()
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        "NAME": env("MYSQL_DATABASE"),
-        "USER": env("MYSQL_USER"),
-        "PASSWORD": env("MYSQL_PASSWORD"),
-        "HOST": env("MYSQL_HOST", default="127.0.0.1"),
-        "PORT": env("MYSQL_PORT", default="3306"),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        engine='django.db.backends.mysql',
+    )
 }
 
 
