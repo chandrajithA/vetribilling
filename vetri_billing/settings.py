@@ -186,5 +186,4 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 CSRF_TRUSTED_ORIGINS = [
     "https://vetribilling.onrender.com/",
-    "https://www.yourcustomdomain.com"
 ]

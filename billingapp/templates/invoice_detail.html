@@ -245,18 +245,26 @@ document.getElementById("emailPdfButton").addEventListener("click", async () => 
       body: formData,
       headers: { "X-CSRFToken": "{{ csrf_token }}" }
     })
-    .then(res => res.json())
-    .then(data => {
-      dialog.style.display = "none";
-      if (data.status === "success") {
-        alert("PDF emailed successfully!");
-      } else {
-        alert("Error: " + data.message);
-      }
+    .then(async res => {
+        let data;
+        try {
+            data = await res.json(); // try to parse as JSON
+        } catch (err) {
+            throw new Error("Server did not return JSON. Status: " + res.status);
+        }
+        
+        dialog.style.display = "none";
+        if (data.status === "success") {
+            alert("PDF emailed successfully!");
+        } else {
+            alert("Error: " + data.message);
+        }
     })
     .catch(err => {
+      dialog.style.display = "none";
       alert("Failed to send email.");
       console.error(err);
+      
     });
   });
 

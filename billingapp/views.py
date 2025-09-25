@@ -164,4 +164,6 @@ Vetri Shoppings
 
         return JsonResponse({"status": "success", "message": "Email is being sent in the background"})
     except Exception as e:
+        import traceback
+        print("EMAIL ERROR:", traceback.format_exc())
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
