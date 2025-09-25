@@ -182,7 +182,7 @@
             font-weight:500;">
   📧 Sending email, please wait...
 </div>
-
+{% endblock %}
 
 {% block script %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -216,7 +216,9 @@ document.getElementById("downloadPdfBtn").addEventListener("click", async () => 
 
 
 // Email button (send to backend, no local download)
+
 document.getElementById("emailPdfButton").addEventListener("click", async () => {
+
   const element = document.getElementById("invoicecontainer");
   const orderid = document.getElementById("emailPdfButton").getAttribute("data-number");
   const { jsPDF } = window.jspdf;
@@ -257,10 +259,11 @@ document.getElementById("emailPdfButton").addEventListener("click", async () => 
       console.error(err);
     });
   });
-  
+
 });
+
 
 </script>
 {% endblock %}
 
-{% endblock %}
+
