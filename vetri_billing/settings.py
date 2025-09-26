@@ -33,7 +33,7 @@ SECRET_KEY = env("SECRET_KEY", default="insecure-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["'vetribilling.onrender.com'", "localhost", "127.0.0.1"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["vetribilling.onrender.com", "localhost", "127.0.0.1"])
 
 
 # Application definition
@@ -180,8 +180,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  
+
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = env('SENDGRID_API_KEY') 
 
 
 CSRF_TRUSTED_ORIGINS = [
