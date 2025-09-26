@@ -201,16 +201,16 @@ def send_pdf_email(request, invoice_id):
         message = Mail(
             from_email=os.environ.get("DEFAULT_FROM_EMAIL"),
             to_emails=recipient_email,
-            subject=f"Invoice - #{invoice.id} - Vetri Shoppings",
+            subject=f"Invoice - #{invoice.id} - Vetri IT Systems",
             plain_text_content=f"""Hello {invoice.customer_name},
 
-Thank you for shopping with us!
+Thank you for choosing our service!
 
-Your invoice number is #{invoice.id}.
+Your invoice number is #INV{invoice.id}.
 Please find your attached invoice as a PDF.
 
 Best regards,
-Vetri Shoppings
+Vetri IT Systems
 """
         )
 

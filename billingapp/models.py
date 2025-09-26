@@ -3,11 +3,16 @@ from django.db import models
 
 
 class Invoice(models.Model):
-    customer_name = models.CharField(max_length=200)
-    customer_mobile = models.CharField(max_length=15)
-    customer_email = models.EmailField()
-    customer_address = models.TextField()
+    name = models.CharField(max_length=200, null=False, blank=False)
+    mobile = models.CharField(max_length=15, null=False, blank=False)
+    email = models.EmailField(null=False, blank=False)
+    address = models.CharField(max_length=200, null=False, blank=False)
+    country = models.CharField(max_length=200, null=False, blank=False)
+    city = models.CharField(max_length=200, null=False, blank=False)
+    pincode = models.PositiveIntegerField(null=False, blank=False)
+    state = models.CharField(max_length=200, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
 
     @property
@@ -28,7 +33,7 @@ class Invoice(models.Model):
     
 
     def __str__(self):
-        return f"Invoice {self.id} - {self.customer_name}"
+        return f"Invoice {self.id} - {self.name}"
 
 
 
