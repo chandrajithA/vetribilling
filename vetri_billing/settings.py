@@ -185,5 +185,5 @@ EMAIL_HOST_PASSWORD = env('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://vetribilling.onrender.com/",
+    "https://vetribilling.onrender.com",
 ]

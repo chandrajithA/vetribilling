@@ -115,54 +115,126 @@ def user_logout(request):
     return redirect('login')
 
 
-from django.core.mail import EmailMessage
-from .email_utils import get_email_connection
+# from django.core.mail import EmailMessage
+# from .email_utils import get_email_connection
+# from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+
+# @login_required
+# @require_POST
+# def send_pdf_email(request,invoice_id):
+#     try:
+
+#         invoice = Invoice.objects.filter(id=invoice_id).first()
+#         if not invoice:
+#             return JsonResponse({"status": "error", "message": "Invoice not found"}, status=404)
+        
+#         pdf_file = request.FILES.get("pdf_file")
+#         if not pdf_file:
+#             return JsonResponse({"status": "error", "message": "No file uploaded"}, status=400)
+        
+#         recipient_email = invoice.customer_email
+#         if not recipient_email:
+#             return JsonResponse({"status": "error", "message": "User has no email"}, status=400)
+        
+#         connection = get_email_connection()
+#         if not connection:
+#             return {"status": "error"}
+
+#         email = EmailMessage(
+#             subject=f"Invoice - #{invoice.id} - Vetri Shoppings",
+#             body=f"""Hello {invoice.customer_name} ,
+
+# Thank you for shopping with us!
+
+# Your invoice number is #{invoice.id}.
+# Please find your attached invoice as a PDF.
+
+# Best regards,  
+# Vetri Shoppings
+# """,
+#             from_email=settings.DEFAULT_FROM_EMAIL,
+#             to=[recipient_email],
+#             connection=connection
+#         )
+
+#         email.attach(pdf_file.name, pdf_file.read(), "application/pdf") 
+#         email.send()
+        
+
+#         return JsonResponse({"status": "success", "message": "Email is being sent in the background"})
+#     except Exception as e:
+#         import traceback
+#         print("EMAIL ERROR:", traceback.format_exc())
+#         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+import os
+import base64
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+from .models import Invoice  # adjust import if needed
+
 
 @login_required
 @require_POST
-def send_pdf_email(request,invoice_id):
+def send_pdf_email(request, invoice_id):
     try:
-
+        # Fetch invoice
         invoice = Invoice.objects.filter(id=invoice_id).first()
         if not invoice:
             return JsonResponse({"status": "error", "message": "Invoice not found"}, status=404)
-        
+
+        # Get uploaded PDF
         pdf_file = request.FILES.get("pdf_file")
         if not pdf_file:
             return JsonResponse({"status": "error", "message": "No file uploaded"}, status=400)
-        
+
+        # Get recipient
         recipient_email = invoice.customer_email
         if not recipient_email:
             return JsonResponse({"status": "error", "message": "User has no email"}, status=400)
-        
-        connection = get_email_connection()
-        if not connection:
-            return {"status": "error"}
 
-        email = EmailMessage(
+        # Create email
+        message = Mail(
+            from_email=os.environ.get("DEFAULT_FROM_EMAIL"),
+            to_emails=recipient_email,
             subject=f"Invoice - #{invoice.id} - Vetri Shoppings",
-            body=f"""Hello {invoice.customer_name} ,
+            plain_text_content=f"""Hello {invoice.customer_name},
 
 Thank you for shopping with us!
 
 Your invoice number is #{invoice.id}.
 Please find your attached invoice as a PDF.
 
-Best regards,  
+Best regards,
 Vetri Shoppings
-""",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[recipient_email],
-            connection=connection
+"""
         )
 
-        email.attach(pdf_file.name, pdf_file.read(), "application/pdf") 
-        email.send()
-        
+        # Attach PDF (must be base64 for SendGrid)
+        file_data = pdf_file.read()
+        encoded_file = base64.b64encode(file_data).decode()
 
-        return JsonResponse({"status": "success", "message": "Email is being sent in the background"})
+        attachment = Attachment(
+            FileContent(encoded_file),
+            FileName(pdf_file.name),
+            FileType("application/pdf"),
+            Disposition("attachment"),
+        )
+        message.attachment = attachment
+
+        # Send with SendGrid API
+        sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+        response = sg.send(message)
+
+        return JsonResponse({
+            "status": "success",
+            "message": f"Email sent (SendGrid status {response.status_code})"
+        })
+
     except Exception as e:
         import traceback
         print("EMAIL ERROR:", traceback.format_exc())
