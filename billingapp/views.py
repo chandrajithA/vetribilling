@@ -153,7 +153,7 @@ Please find your attached invoice as a PDF.
 Best regards,  
 Vetri Shoppings
 """,
-            from_email=settings.EMAIL_HOST_USER,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             to=[recipient_email],
             connection=connection
         )

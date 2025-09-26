@@ -28,7 +28,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY", default="insecure-key")
+SECRET_KEY = env("PROJECT_SECRET_KEY", default="insecure-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
@@ -177,15 +177,12 @@ LOGOUT_REDIRECT_URL = "/login/"  # after logout, go to login
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  
-
 EMAIL_HOST_USER = "apikey"
 EMAIL_HOST_PASSWORD = env('SENDGRID_API_KEY') 
-
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 CSRF_TRUSTED_ORIGINS = [
     "https://vetribilling.onrender.com/",
