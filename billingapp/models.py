@@ -1,5 +1,6 @@
 from django.db import models
-
+from collections import defaultdict
+from decimal import Decimal, ROUND_HALF_UP
 
 
 class Invoice(models.Model):
@@ -11,6 +12,7 @@ class Invoice(models.Model):
     city = models.CharField(max_length=200, null=False, blank=False)
     pincode = models.PositiveIntegerField(null=False, blank=False)
     state = models.CharField(max_length=200, null=False, blank=False)
+    gst_no = models.CharField(max_length=15, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -31,6 +33,24 @@ class Invoice(models.Model):
     def total_amount(self):
         return self.total_with_tax   # alias
     
+    @property
+    def invoice_number(self):
+        return f"INV_{self.id:03d}" 
+    
+    @property
+    def tax_summary(self):
+        """
+        Groups tax by percentage:
+        returns dict { tax_percentage: total_tax_amount }
+        """
+        summary = defaultdict(Decimal)
+        for item in self.items.all():
+            summary[item.tax_percentage] += item.tax_amount
+        # round to 2 decimals
+        return {
+            perc: amt.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            for perc, amt in summary.items()
+        }
 
     def __str__(self):
         return f"Invoice {self.id} - {self.name}"

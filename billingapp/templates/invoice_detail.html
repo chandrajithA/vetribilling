@@ -1,76 +1,149 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}
 <title>Invoice Detail</title>
 {% endblock %}
 
 {% block design %}
-    <style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+    }
+
+    .invoice-container {
+        width: 210mm;   /* A4 width */
+        min-height: 297mm; /* A4 height */
+        margin: 20px auto;
+        background: #fff;
+        padding: 25px 40px;
+        border: 1px solid #ddd;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid #0a3d62;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .company-info {
+        text-align: center;
+        flex: 1;
+    }
+    .company-info h2 {
+        margin: 0;
+        color: #0a3d62;
+    }
+    .company-info h4 {
+        margin: 5px 0;
+        color: #333;
+    }
+    .company-logo {
+        width: 120px;
+        height: 120px;
+    }
+
+    /* Invoice Info */
+    .invoice-meta {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+        font-size: 14px;
+        gap: 20px;
+    }
+    .customer-details, .invoice-details {
+        width: 48%;
+        background: #f9f9f9;
+        padding: 12px 15px;
+        border: 2px solid black;
+        border-radius: 8px;
         
-        .invoice-container {
-            max-width: 900px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-        }
-        h2, h3, h4 {
+    }
+
+    .invoice-details{
+        text-align: end;
+    }
+    .customer-details p, .invoice-details p {
+        margin: 4px 0;
+        font-size: 16px;
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+    th {
+        background: #0a3d62;
+        color: white;
+    }
+
+    /* Totals */
+    .totals {
+        margin-top: 20px;
+        text-align: right;
+    }
+    .totals p {
+        margin: 5px 0;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .gst-row {
+        background: #f57c00;
+        padding: 10px;
+        text-align: right;
+        font-weight: bold;
+        margin: 15px 0px;
+        color: white;
+        border-radius: 10px;
+    }
+    .grand-total {
+        background: #f57c00;
+        color: white;
+        padding: 12px;
+        text-align: right;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    /* Terms */
+    .terms {
+        margin-top: 30px;
+        color: #444;
+        background-color: #f1f1f1;
+        padding: 5px;
+        & h2{
+            color: #f57c00;
             text-align: center;
-            color: #333;
-            margin:5px;
         }
-        .customer-details {
-            margin-bottom: 20px;
-            background: #f0f4ff;
-            padding: 15px;
-            border-radius: 10px;
-        }
-        .customer-details p {
-            margin: 5px 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: center;
-        }
-        th {
-            background: #4f46e5;
-            color: white;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        tr:hover {
-            background: #f1f5ff;
-        }
-        td {
-            color: #333;
-        }
-        .grand-total {
-            text-align: right;
-            font-size: 18px;
-            margin-top: 20px;
-            font-weight: bold;
-            color: #222;
+        & p{
+            font-size: 14px;
         }
 
-        .summarypdfbtnarea{
-        margin: 50px 0px;
+    }
+
+
+    /* Buttons */
+    .summarypdfbtnarea {
+        margin: 30px 0;
         display: flex;
         justify-content: center;
         gap: 15px;
     }
-
-    .ordersummarybtn{
-        background: #4f46e5;
+    .ordersummarybtn {
+        background: #0a3d62;
         color: white;
         border: none;
         padding: 10px 18px;
@@ -78,109 +151,125 @@
         cursor: pointer;
         font-weight: 700;
         text-decoration: none;
-        display: inline-block;
-        font-size:16px;
-        
-        
+        font-size: 15px;
     }
-        /* Responsive */
-        @media (max-width: 768px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-                width: 100%;
-            }
-            thead {
-                display: none;
-            }
-            tr {
-                margin-bottom: 15px;
-                background: #f9f9f9;
-                border-radius: 10px;
-                padding: 10px;
-            }
-            td {
-                text-align: right;
-                padding-left: 50%;
-                position: relative;
-            }
-            td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 15px;
-                width: 45%;
-                text-align: left;
-                font-weight: bold;
-                color: #555;
-            }
-        }
-    </style>
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="invoice-container" id="invoicecontainer">
-        <h2>Invoice #{{ invoice.id }}</h2>
+<div class="invoice-container" id="invoicecontainer">
 
-        <div class="customer-details">
-            <h2>Vetri Shoppings</h2>
-            <h3>Surandai, Tenkasi disrict</h3>
-            <h4>Ph: 8745896585</h4>
-            <p><strong>Customer:</strong> {{ invoice.customer_name }}</p>
-            <p><strong>Mobile:</strong> {{ invoice.customer_mobile }}</p>
-            <p><strong>Email:</strong> {{ invoice.customer_email }}</p>
-            <p><strong>Address:</strong> {{ invoice.customer_address }}</p>
-            <p><strong>Date:</strong> {{ invoice.created_at|date:"d M Y, h:i A" }}</p>
+    <!-- Header -->
+    <div class="invoice-header">
+        <img src="{% static 'images/logo.jpg' %}" class="company-logo">
+        <div class="company-info">
+            <h2>VETRI IT SYSTEMS</h2>
+            <h4>April’s Complex & Shanthi Complex</h4>
+            <h4>Sivagurunathapuram, Surandai - 627859</h4>
+            <p>Contact: 84381 64827 / 84387 81327 | GST: 33FGAPP6566F1Z9</p>
         </div>
-
-        <h3>Products</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Unit Price</th>
-                    <th>Qty</th>
-                    <th>Tax %</th>
-                    <th>Subtotal</th>
-                    <th>Tax</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in invoice.items.all %}
-                <tr>
-                    <td data-label="Product">{{ item.product_name }}</td>
-                    <td data-label="Unit Price">₹ {{ item.unit_price|floatformat:2 }}</td>
-                    <td data-label="Qty">{{ item.quantity }}</td>
-                    <td data-label="Tax %">{{ item.tax_percentage|floatformat:2 }}%</td>
-                    <td data-label="Subtotal">₹ {{ item.subtotal|floatformat:2 }}</td>
-                    <td data-label="Tax">₹ {{ item.tax_amount|floatformat:2 }}</td>
-                    <td data-label="Total">₹ {{ item.total_with_tax|floatformat:2 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <p class="grand-total">Grand Total: ₹ {{ invoice.total_amount|floatformat:2 }}</p>
+        <img src="" class="company-logo" style="visibility: hidden;">
     </div>
 
-    <div class="summarypdfbtnarea">
-        <button id="downloadPdfBtn" class="ordersummarybtn" data-number="{{invoice.id}}">Download PDF</button>
-        <button id="emailPdfButton" class="ordersummarybtn" data-number="{{invoice.id}}">Email PDF</button>
+    <!-- Invoice + Customer Info -->
+    <div class="invoice-meta">
+        <div class="customer-details">
+            <p><strong>Customer:</strong> {{ invoice.name }}</p>
+            <p><strong>Mobile:</strong> {{ invoice.mobile }}</p>
+            <p><strong>Email:</strong> {{ invoice.email }}</p>
+            <p><strong>Address:</strong> {{ invoice.address }}, {{ invoice.city }} - {{ invoice.pincode }}, {{ invoice.state }}</p>
+            {% if invoice.gst_no %}
+                <p><strong>Candidate GST No:</strong> {{ invoice.gst_no }}</p>
+            {% else %}
+                <p><strong>Candidate GST No:</strong> NA</p>
+            {% endif %}
+        </div>
+        <div class="invoice-details">
+            <p style="font-size: 26px;"><strong>GST Invoice</strong></p>
+            <p><strong>Invoice No:</strong> {{ invoice.invoice_number }}</p>
+            <p><strong>Invoice Date:</strong> {{ invoice.created_at|date:"d-m-Y" }}</p>
+        </div>
     </div>
 
-    <div id="emailSendingDialog" 
-     style="display:none; 
-            position:fixed; 
-            top:50%; 
-            left:50%; 
-            transform:translate(-50%, -50%);
-            background:#fff; 
-            padding:20px 30px; 
-            border-radius:10px; 
-            box-shadow:0 4px 12px rgba(0,0,0,0.2); 
-            z-index:9999;
-            font-size:16px; 
-            font-weight:500;">
-  📧 Sending email, please wait...
+    <!-- Products -->
+    <h3 style="text-align:center; margin:15px 0;">Invoice Details</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Unit Price</th>
+                <th>Qty</th>
+                <th>GST %</th>
+                <!-- <th>Subtotal</th> -->
+                <th>GST</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in invoice.items.all %}
+            <tr>
+                <td>{{ item.product_name }}</td>
+                <td>₹ {{ item.unit_price|floatformat:2 }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.tax_percentage|floatformat:2 }}%</td>
+                <!-- <td>₹ {{ item.subtotal|floatformat:2 }}</td> -->
+                <td>₹ {{ item.tax_amount|floatformat:2 }}</td>
+                <td>₹ {{ item.total_with_tax|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+            <tr style="font-weight: bold; background: #f1f1f1;">
+                <td colspan="5" style="text-align: right;">Total</td>
+                <td>₹ {{ invoice.total_with_tax|floatformat:2 }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="gst-row">
+        {% for perc, amt in invoice.tax_summary.items %}
+            GST ({{ perc|floatformat:0 }}%) : ₹ {{ amt|floatformat:2 }} <br>
+        {% endfor %}
+        {% if invoice.tax_summary|length > 1 %}
+            Total GST : ₹ {{ invoice.tax_amount|floatformat:2 }}<br>
+        {% endif %}
+        
+    </div>
+    <div class="grand-total">
+        Total Amount Paid: ₹ {{ invoice.total_amount|floatformat:2 }}
+    </div>
+
+    <!-- Terms -->
+    <div class="terms">
+        <h2>Terms & Conditions</h2>
+        <p>1. The above amount paid is only for the mentioned products/services and not for any other offers.</p>
+        <p>2. This invoice is valid only with Vetri IT Systems.</p>
+        <p style="text-align: center;margin-top: 30px; font-size: 14px;"> *This is a system-generated invoice. No admin signature required.</p>
+    </div>
+</div>
+
+<!-- Buttons -->
+<div class="summarypdfbtnarea">
+    <button id="downloadPdfBtn" class="ordersummarybtn" data-number="{{invoice.invoice_number}}">Download</button>
+    <button id="emailPdfButton" class="ordersummarybtn" data-number="{{invoice.id}}" data-number2="{{invoice.invoice_number}}">Email to Customer</button>
+    <a href="{% url 'edit_invoice' invoice.id %}" class="ordersummarybtn">Edit Details</a>
+</div>
+
+<!-- Dialog -->
+<div id="emailSendingDialog" style="display:none;position:fixed;top:50%;left:50%;
+    transform:translate(-50%, -50%);background:#fff;padding:30px 40px;border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);z-index:9999;text-align:center;font-family:sans-serif;
+    font-size:16px;font-weight:500;color:#333;">
+    
+    <!-- Rotating loader -->
+    <div class="loader" style="margin:0 auto 15px auto;border:6px solid #f3f3f3;border-top:6px solid #3498db;
+        border-radius:50%;width:50px;height:50px;animation:spin 1s linear infinite;"></div>
+
+    <div>Sending email to customer, it takes few seconds...</div>
 </div>
 {% endblock %}
 
@@ -221,6 +310,7 @@ document.getElementById("emailPdfButton").addEventListener("click", async () => 
 
   const element = document.getElementById("invoicecontainer");
   const orderid = document.getElementById("emailPdfButton").getAttribute("data-number");
+  const ordernumber = document.getElementById("emailPdfButton").getAttribute("data-number2");
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "pt", "a4");
 
@@ -238,7 +328,7 @@ document.getElementById("emailPdfButton").addEventListener("click", async () => 
     // Create blob (do NOT save locally)
     const pdfBlob = pdf.output("blob");
     const formData = new FormData();
-    formData.append("pdf_file", pdfBlob, `Invoice#${orderid}.pdf`);
+    formData.append("pdf_file", pdfBlob, `Invoice#${ordernumber}.pdf`);
 
     await fetch(`/invoice/send-pdf-email/${orderid}/`, {
       method: "POST",

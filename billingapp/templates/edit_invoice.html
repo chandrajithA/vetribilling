@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 <title>Edit Invoice</title>
@@ -12,12 +13,13 @@
         font-size: 26px;
         margin-bottom: 20px;
     }
-    .container {
+    .container{
         display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
+        justify-content: center;  /* center horizontally */
+        align-items: center;      /* center vertically */
+        min-height: 100vh; 
     }
+    /* Form Styling */
     .createinvoiceform {
         background: #fff;
         padding: 25px;
@@ -26,6 +28,8 @@
         max-width: 1100px;
         margin: 0 auto;
     }
+
+    /* Fieldset Styling */
     fieldset {
         border: 1px solid #e0e0e0;
         border-radius: 10px;
@@ -33,12 +37,48 @@
         padding: 20px;
         background: #fafafa;
     }
+
     legend {
         font-weight: bold;
         color: #2c3e50;
         padding: 0 10px;
         font-size: 18px;
     }
+
+    .form-row {
+    display: flex;
+    gap: 20px;  /* space between columns */
+    margin-bottom: 15px;
+    width:97%;
+}
+
+    .form-group {
+        flex: 1;  /* make both fields equal width */
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #222;
+        font-size: 16px;
+    }
+    
+
+    .form-control {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    }
+
+    .form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0,123,255,.5);
+    }
+    
     table {
         width: 100%;
         border-collapse: collapse;
@@ -150,13 +190,56 @@
 {% endblock %}
 
 {% block content %}
-<h2>Edit Invoice #{{ invoice.id }}</h2>
+<h2>Edit Invoice #{{ invoice.invoice_number }}</h2>
 <div class="container">
     <form method="post" class="createinvoiceform">
         {% csrf_token %}
         <fieldset>
             <legend>Customer Details</legend>
-            {{ form.as_p }}
+            <div class="form-group">
+                <div class="form-label">{{ form.name.label }}</div>
+                {{ form.name }}
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">{{ form.mobile.label }}</div>
+                {{ form.mobile }}
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">{{ form.email.label }}</div>
+                {{ form.email }}
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">Candidate GST No: (optional)</div>
+                {{ form.gst_no }}
+            </div>
+
+            <div class="form-group">
+                <div class="form-label">{{ form.address.label }}</div>
+                {{ form.address }}
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="form-label">{{ form.city.label }}</div>
+                    {{ form.city }}
+                </div>
+                <div class="form-group">
+                    <div class="form-label">{{ form.pincode.label }}</div>
+                    {{ form.pincode }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="form-label">{{ form.state.label }}</div>
+                    {{ form.state }}
+                </div>
+                <div class="form-group">
+                    <div class="form-label">{{ form.country.label }}</div>
+                    {{ form.country }}
+                </div>
+            </div>
         </fieldset>
 
         <fieldset>
@@ -169,7 +252,7 @@
                         <th>Quantity</th>
                         <th>Tax %</th>
                         <th>Subtotal</th>
-                        <th>Total with Tax</th>
+                        <th>Total</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -187,7 +270,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <button type="button" onclick="addRow()" class="addproductbtn">Add Product</button>
+            <button type="button" onclick="addRow()" class="addproductbtn">+ Add Product</button>
         </fieldset>
 
         <h3>Grand Total: <span id="grandTotal">{{ invoice.total_amount }}</span></h3>

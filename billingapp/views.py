@@ -51,7 +51,7 @@ def create_invoice(request):
 
 @login_required
 def invoice_detail(request, pk):
-    invoice = Invoice.objects.get(pk=pk)
+    invoice = Invoice.objects.filter(pk=pk).first()
     return render(request, "invoice_detail.html", {"invoice": invoice})
 
 
@@ -59,7 +59,7 @@ def invoice_detail(request, pk):
 @login_required
 @never_cache
 def edit_invoice(request, pk):
-    invoice = get_object_or_404(Invoice, pk=pk)
+    invoice = Invoice.objects.filter(pk=pk).first()
 
     if request.method == "POST":
         form = InvoiceForm(request.POST, instance=invoice)
@@ -102,7 +102,7 @@ def edit_invoice(request, pk):
 
 @login_required
 def delete_invoice(request, pk):
-    invoice = get_object_or_404(Invoice, pk=pk)
+    invoice = Invoice.objects.filter(pk=pk).first()
     invoice.delete()
     return redirect("dashboard")
 
@@ -193,7 +193,7 @@ def send_pdf_email(request, invoice_id):
             return JsonResponse({"status": "error", "message": "No file uploaded"}, status=400)
 
         # Get recipient
-        recipient_email = invoice.customer_email
+        recipient_email = invoice.email
         if not recipient_email:
             return JsonResponse({"status": "error", "message": "User has no email"}, status=400)
 
@@ -201,12 +201,12 @@ def send_pdf_email(request, invoice_id):
         message = Mail(
             from_email=os.environ.get("DEFAULT_FROM_EMAIL"),
             to_emails=recipient_email,
-            subject=f"Invoice - #{invoice.id} - Vetri IT Systems",
-            plain_text_content=f"""Hello {invoice.customer_name},
+            subject=f"Invoice - #{invoice.invoice_number} - Vetri IT Systems",
+            plain_text_content=f"""Hello {invoice.name},
 
 Thank you for choosing our service!
 
-Your invoice number is #INV{invoice.id}.
+Your invoice number is #{invoice.invoice_number}.
 Please find your attached invoice as a PDF.
 
 Best regards,
